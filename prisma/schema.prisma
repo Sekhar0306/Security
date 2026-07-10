@@ -1,0 +1,31 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Scan {
+  id        String    @id @default(cuid())
+  target    String
+  scannedAt DateTime  @default(now())
+  findings  Finding[]
+}
+
+model Finding {
+  id             String   @id @default(cuid())
+  scan           Scan     @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  scanId         String
+  key            String
+  title          String
+  severity       String
+  passed         Boolean
+  detail         String
+  recommendation String
+  status         String   @default("open") // open | resolved | ignored
+  createdAt      DateTime @default(now())
+
+  @@index([scanId])
+}
